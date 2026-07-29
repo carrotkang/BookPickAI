@@ -16,6 +16,23 @@ const BookDetailPage = lazy(() =>
 const LibraryPage = lazy(() =>
   import("@/pages/LibraryPage").then((module) => ({ default: module.LibraryPage })),
 );
+const RecommendationPage = lazy(() =>
+  import("@/pages/RecommendationPage").then((module) => ({
+    default: module.RecommendationPage,
+  })),
+);
+const LoginPage = lazy(() =>
+  import("@/pages/LoginPage").then((module) => ({ default: module.LoginPage })),
+);
+const SignupPage = lazy(() =>
+  import("@/pages/SignupPage").then((module) => ({ default: module.SignupPage })),
+);
+const ProfilePage = lazy(() =>
+  import("@/pages/ProfilePage").then((module) => ({ default: module.ProfilePage })),
+);
+const AdminPage = lazy(() =>
+  import("@/pages/AdminPage").then((module) => ({ default: module.AdminPage })),
+);
 const NotFoundPage = lazy(() =>
   import("@/pages/NotFoundPage").then((module) => ({ default: module.NotFoundPage })),
 );
@@ -40,8 +57,13 @@ export default function App() {
           <Switch>
             <Route path="/" component={HomePage} />
             <Route path="/search" component={SearchPage} />
+            <Route path="/recommend" component={RecommendationPage} />
             <Route path="/books/:isbn13" component={BookDetailPage} />
             <Route path="/library" component={LibraryPage} />
+            <Route path="/login" component={LoginPage} />
+            <Route path="/signup" component={SignupPage} />
+            <Route path="/profile" component={ProfilePage} />
+            <Route path="/admin" component={AdminPage} />
             <Route component={NotFoundPage} />
           </Switch>
         </Suspense>

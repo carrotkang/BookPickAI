@@ -1,14 +1,16 @@
-import { Bookmark, Menu, Search, Sparkles, X } from "lucide-react";
+import { Bookmark, LogIn, LogOut, Menu, Search, ShieldCheck, Sparkles, UserRound, X } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
+import { useAuth } from "@/store/AuthContext";
 
 const navItems = [
   { label: "책 찾기", href: "/search" },
-  { label: "AI 추천", href: "/#recommend" },
+  { label: "AI 추천", href: "/recommend" },
   { label: "내 서재", href: "/library" },
 ];
 
 export function Header() {
+  const { user, logout } = useAuth();
   const [location, navigate] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -71,6 +73,41 @@ export function Header() {
           <Bookmark size={18} />
         </Link>
 
+        {user ? (
+          <div className="hidden items-center gap-2 sm:flex">
+            <Link
+              href={user.role === "admin" ? "/admin" : "/profile"}
+              className="flex items-center gap-2 rounded-full border border-black/8 bg-white py-2 pl-2 pr-3 text-xs font-bold hover:border-[var(--brand)]"
+              aria-label={user.role === "admin" ? "관리자 페이지" : "내 프로필"}
+            >
+              <span className="flex size-7 items-center justify-center rounded-full bg-[#e9f3ef] text-[var(--brand)]">
+                {user.role === "admin" ? <ShieldCheck size={14} /> : <UserRound size={14} />}
+              </span>
+              <span className="max-w-20 truncate">{user.name}</span>
+            </Link>
+            <button
+              type="button"
+              onClick={() => {
+                logout();
+                navigate("/");
+              }}
+              className="flex h-10 items-center justify-center gap-2 rounded-full border border-black/8 bg-white px-3 text-xs font-bold text-[var(--muted)] hover:border-[#b86b5d]/40 hover:bg-[#f8eae6] hover:text-[#9b5145]"
+              aria-label="로그아웃"
+              title="로그아웃"
+            >
+              <LogOut size={17} />
+              로그아웃
+            </button>
+          </div>
+        ) : (
+          <Link
+            href="/login"
+            className="hidden items-center gap-2 rounded-full bg-[var(--brand)] px-4 py-2.5 text-xs font-black text-white hover:bg-[var(--brand-dark)] sm:flex"
+          >
+            <LogIn size={15} /> 로그인
+          </Link>
+        )}
+
         <button
           type="button"
           onClick={() => setMenuOpen((open) => !open)}
@@ -105,6 +142,27 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
+            <Link
+              href={user ? (user.role === "admin" ? "/admin" : "/profile") : "/login"}
+              onClick={() => setMenuOpen(false)}
+              className="mt-2 flex items-center gap-2 rounded-xl border border-black/8 bg-white px-4 py-3 font-semibold"
+            >
+              {user?.role === "admin" ? <ShieldCheck size={17} /> : <UserRound size={17} />}
+              {user ? (user.role === "admin" ? "관리자 페이지" : "내 프로필") : "로그인"}
+            </Link>
+            {user && (
+              <button
+                type="button"
+                onClick={() => {
+                  logout();
+                  setMenuOpen(false);
+                  navigate("/");
+                }}
+                className="flex items-center gap-2 rounded-xl px-4 py-3 text-left font-semibold text-[#9b5145] hover:bg-[#f8eae6]"
+              >
+                <LogOut size={17} /> 로그아웃
+              </button>
+            )}
           </nav>
         </div>
       )}

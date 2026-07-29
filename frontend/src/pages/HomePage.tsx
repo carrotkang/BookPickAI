@@ -2,11 +2,13 @@ import {
   ArrowRight,
   BookOpen,
   BrainCircuit,
+  ChevronLeft,
+  ChevronRight,
   MessageCircleMore,
   Search,
   Sparkles,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { BookCard } from "@/components/BookCard";
 import { BookCover } from "@/components/BookCover";
@@ -17,7 +19,15 @@ import { mockBooks } from "@/data/mockBooks";
 export function HomePage() {
   const [, navigate] = useLocation();
   const [query, setQuery] = useState("");
+  const trendingRef = useRef<HTMLDivElement>(null);
   const featured = mockBooks[0];
+
+  const moveTrending = (direction: -1 | 1) => {
+    trendingRef.current?.scrollBy({
+      left: direction * Math.min(trendingRef.current.clientWidth * 0.82, 720),
+      behavior: "smooth",
+    });
+  };
 
   const search = (event: React.FormEvent) => {
     event.preventDefault();
@@ -29,16 +39,15 @@ export function HomePage() {
       <section className="soft-grid relative overflow-hidden border-b border-black/6">
         <div className="absolute left-[8%] top-12 size-40 rounded-full bg-[#d9f29d]/35 blur-3xl" />
         <div className="absolute right-[7%] top-32 size-52 rounded-full bg-[#9ed8ca]/30 blur-3xl" />
-        <div className="page-shell grid min-h-[680px] items-center gap-12 py-16 lg:grid-cols-[1.08fr_0.92fr] lg:py-20">
+        <div className="page-shell grid min-h-[610px] items-center gap-12 py-14 lg:grid-cols-[1.08fr_0.92fr] lg:py-16">
           <div className="fade-up relative z-10">
             <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-[var(--brand)]/15 bg-white/75 px-4 py-2 text-xs font-bold text-[var(--brand)] shadow-sm backdrop-blur">
               <Sparkles size={14} />
               리뷰 속 진짜 이야기를 AI로 한눈에
             </div>
-            <h1 className="display-serif max-w-2xl text-[clamp(3rem,7vw,5.7rem)] font-bold leading-[1.03]">
-              다음 책을 고르는
-              <br />
-              <span className="relative text-[var(--brand)]">
+            <h1 className="home-hero-title display-serif font-bold">
+              <span>다음 책을 고르는</span>
+              <span className="relative inline-block text-[var(--brand)]">
                 더 나은 기준
                 <svg
                   className="absolute -bottom-2 left-0 w-full"
@@ -114,6 +123,70 @@ export function HomePage() {
         </div>
       </section>
 
+      <section className="page-shell py-20">
+        <div className="overflow-hidden rounded-[32px] bg-[var(--ink)] text-white shadow-[0_20px_60px_rgba(25,45,38,0.13)]">
+          <div className="grid lg:grid-cols-[0.82fr_1.18fr]">
+            <div className="relative overflow-hidden border-b border-white/8 p-8 sm:p-11 lg:border-b-0 lg:border-r">
+              <div className="absolute -bottom-24 -right-20 size-64 rounded-full border-[45px] border-white/5" />
+              <p className="text-xs font-extrabold tracking-[0.16em] text-[var(--lime)] uppercase">
+                Today&apos;s personal pick
+              </p>
+              <h2 className="display-serif mt-4 text-3xl font-bold leading-tight sm:text-4xl">
+                오늘 당신을 위한
+                <br />
+                세 권의 책
+              </h2>
+              <p className="mt-5 max-w-md break-keep text-sm leading-7 text-white/55">
+                잔잔한 분위기와 읽기 쉬운 문체를 좋아하는 취향을 기준으로 골랐어요.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-2">
+                {["잔잔한 분위기", "감정 묘사", "높은 가독성"].map((taste) => (
+                  <span key={taste} className="rounded-full border border-white/10 bg-white/6 px-3 py-1.5 text-xs text-white/65">
+                    {taste}
+                  </span>
+                ))}
+              </div>
+              <Link
+                href="/recommend"
+                className="mt-8 inline-flex items-center gap-2 rounded-full bg-[var(--lime)] px-5 py-3 text-sm font-black text-[var(--ink)] hover:gap-3"
+              >
+                추천 기준 확인하기 <ArrowRight size={16} />
+              </Link>
+            </div>
+
+            <div className="grid gap-px bg-white/8 sm:grid-cols-3">
+              {mockBooks.slice(0, 3).map((book, index) => (
+                <Link
+                  key={book.id}
+                  href={`/books/${book.isbn13}`}
+                  className="group bg-[var(--ink)] p-6 hover:bg-white/[0.045] sm:p-7"
+                >
+                  <div className="mx-auto w-[112px]">
+                    <BookCover
+                      book={book}
+                      compact
+                      className="w-full transition duration-300 group-hover:-translate-y-1"
+                    />
+                  </div>
+                  <div className="mt-6">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-[10px] font-black tracking-[0.12em] text-[var(--lime)] uppercase">
+                        Match {94 - index * 3}%
+                      </span>
+                      <span className="text-[10px] text-white/35">{book.category}</span>
+                    </div>
+                    <h3 className="mt-2 line-clamp-2 font-bold leading-6">{book.title}</h3>
+                    <p className="mt-2 line-clamp-2 text-xs leading-5 text-white/45">
+                      {book.insight.recommendedFor[0]}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="page-shell py-24">
         <SectionHeading
           eyebrow="Trending now"
@@ -121,10 +194,73 @@ export function HomePage() {
           description="평점과 관심도를 바탕으로 오늘 주목받는 책을 모았어요."
           link="/search"
         />
-        <div className="grid grid-cols-2 gap-x-4 gap-y-12 sm:grid-cols-3 md:gap-x-7 lg:grid-cols-6">
+        <div className="-mt-5 mb-7 flex items-center justify-between gap-4">
+          <p className="text-xs text-[var(--muted)]">
+            <span className="font-black text-[var(--brand)]">12권</span> · 옆으로 넘겨 더 살펴보세요
+          </p>
+          <div className="hidden items-center gap-2 sm:flex">
+            <button
+              type="button"
+              onClick={() => moveTrending(-1)}
+              className="flex size-10 items-center justify-center rounded-full border border-black/9 bg-white text-[var(--muted)] hover:border-[var(--brand)] hover:text-[var(--brand)]"
+              aria-label="인기 도서 이전 목록"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <button
+              type="button"
+              onClick={() => moveTrending(1)}
+              className="flex size-10 items-center justify-center rounded-full border border-black/9 bg-white text-[var(--muted)] hover:border-[var(--brand)] hover:text-[var(--brand)]"
+              aria-label="인기 도서 다음 목록"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+        </div>
+        <div
+          ref={trendingRef}
+          className="book-carousel -mx-2 flex snap-x snap-mandatory gap-4 overflow-x-auto px-2 pb-5 md:gap-6"
+          aria-label="인기 도서 가로 목록"
+        >
           {mockBooks.map((book) => (
-            <BookCard key={book.id} book={book} showRank />
+            <div key={book.id} className="w-[158px] shrink-0 snap-start sm:w-[174px]">
+              <BookCard book={book} showRank />
+            </div>
           ))}
+        </div>
+      </section>
+
+      <section className="border-y border-black/7 bg-white py-20">
+        <div className="page-shell">
+          <SectionHeading
+            eyebrow="Browse by mood"
+            title="장르에서 시작하는 새로운 발견"
+            description="익숙한 장르부터 평소 고르지 않던 분야까지 가볍게 둘러보세요."
+          />
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            {[
+              { name: "소설", note: "이야기에 깊이 빠지고 싶을 때", icon: BookOpen, color: "bg-[#dceee8]" },
+              { name: "인문", note: "생각의 폭을 넓히고 싶을 때", icon: BrainCircuit, color: "bg-[#eee7d8]" },
+              { name: "에세이", note: "마음에 작은 쉼이 필요할 때", icon: MessageCircleMore, color: "bg-[#f4e4dd]" },
+              { name: "경제·경영", note: "일과 성장을 고민하고 있을 때", icon: Sparkles, color: "bg-[#e3e7f1]" },
+              { name: "과학·기술", note: "새로운 지식을 발견하고 싶을 때", icon: Search, color: "bg-[#e5efcf]" },
+            ].map(({ name, note, icon: Icon, color }) => (
+              <Link
+                key={name}
+                href={`/search?genre=${encodeURIComponent(name)}`}
+                className="group rounded-[24px] border border-black/7 bg-[var(--paper)] p-5 hover:-translate-y-1 hover:border-[var(--brand)]/30 hover:shadow-lg"
+              >
+                <span className={`flex size-11 items-center justify-center rounded-2xl ${color} text-[var(--brand-dark)]`}>
+                  <Icon size={19} />
+                </span>
+                <h3 className="mt-6 font-black">{name}</h3>
+                <p className="mt-2 break-keep text-xs leading-5 text-[var(--muted)]">{note}</p>
+                <span className="mt-5 flex items-center gap-1 text-xs font-black text-[var(--brand)] group-hover:gap-2">
+                  둘러보기 <ArrowRight size={13} />
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 

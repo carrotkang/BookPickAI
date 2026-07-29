@@ -16,7 +16,10 @@ export function BookCard({ book, showRank = false }: BookCardProps) {
     <article className="group min-w-0">
       <div className="relative px-2 pt-2">
         {showRank && book.rank && (
-          <span className="display-serif absolute -left-1 -top-1 z-10 text-5xl font-black text-[var(--ink)]">
+          <span
+            className="absolute left-0 top-0 z-20 flex size-10 -translate-x-1 -translate-y-1 items-center justify-center rounded-full border-2 border-[var(--paper)] bg-[var(--ink)] text-sm font-black tabular-nums text-white shadow-[0_8px_20px_rgba(29,41,38,0.2)]"
+            aria-label={`${book.rank}위`}
+          >
             {book.rank}
           </span>
         )}

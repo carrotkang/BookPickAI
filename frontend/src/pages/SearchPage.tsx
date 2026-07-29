@@ -7,9 +7,12 @@ import { categories, mockBooks } from "@/data/mockBooks";
 export function SearchPage() {
   const searchString = useSearch();
   const [, navigate] = useLocation();
-  const initialQuery = new URLSearchParams(searchString).get("q") ?? "";
+  const searchParams = new URLSearchParams(searchString);
+  const initialQuery = searchParams.get("q") ?? "";
+  const requestedGenre = searchParams.get("genre") ?? "전체";
+  const initialCategory = categories.includes(requestedGenre) ? requestedGenre : "전체";
   const [query, setQuery] = useState(initialQuery);
-  const [category, setCategory] = useState("전체");
+  const [category, setCategory] = useState(initialCategory);
   const [sort, setSort] = useState("추천순");
   const [filterOpen, setFilterOpen] = useState(false);
 
